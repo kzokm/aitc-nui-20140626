@@ -1,22 +1,21 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Janken - You will win!</title>
+<meta charset="UTF-8">
+<title>Janken - You will win!</title>
+
 <!--
-  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
-  <script src="http://js.leapmotion.com/leap-0.4.3.min.js"></script>
+<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="http://js.leapmotion.com/leap-0.4.3.min.js"></script>
 -->
-  <script src="vendor/js/jquery-2.1.1.min.js"></script>
-  <script src="vendor/js/leap-0.4.3.min.js"></script>
-</head>
-<body>
-  <div id="my-hand" style="font-size:300%;"></div>
-  <div id="image-cache" style="display:none">
-    <img class="gu" src="images/gu.png">
-    <img class="choki" src="images/choki.png">
-    <img class="pa" src="images/pa.png">
-  </div>
+<script src="vendor/js/jquery-2.1.1.min.js"></script>
+<script src="vendor/js/leap-0.4.3.min.js"></script>
+
+<div id="my-hand" style="font-size:300%;"></div>
+<div id="image-cache" style="display:none">
+  <img class="gu" src="images/gu.png" alt="ぐー">
+  <img class="choki" src="images/choki.png" alt="ちょき">
+  <img class="pa" src="images/pa.png" alt="ぱー">
+</div>
+
 <script>
 $(function() {
   Leap.loop(function(frame){
@@ -61,5 +60,3 @@ $(function() {
   reset();
 });
 </script>
-</body>
-</html>

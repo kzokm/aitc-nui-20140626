@@ -1,34 +1,33 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Bone Hands</title>
+<meta charset="utf-8">
+<title>Bone Hands</title>
+
 <!--
-  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
-  <script src="http://js.leapmotion.com/leap-0.6.0.min.js"></script>
+<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="http://js.leapmotion.com/leap-0.6.0.min.js"></script>
 -->
-  <script src="vendor/js/jquery-2.1.1.min.js"></script>
-  <script src="vendor/js/leap-0.6.0.min.js"></script>
-  <link rel="stylesheet" href="css/canvas.css">
-</head>
-<body>
-  <h1>Bone Hands</h1>
-  <p>Show the all bone positions.</p>
+<script src="vendor/js/jquery-2.1.1.min.js"></script>
+<script src="vendor/js/leap-0.6.0.min.js"></script>
 
-  <div class="controls">
-    視点方向
-    <select name="viewmode">
-      <option value="xy">手前(Z to X-Y)</option>
-      <option value="xz">真上(Y to X-Z)</option>
-    </select>
-  </div>
+<link rel="stylesheet" href="css/canvas.css">
 
-  <div id="content">
-    <canvas></canvas>
-  </div>
-  <div id="dump"></div>
+<h1>Bone Hands</h1>
+<p>Show the all bone positions.</p>
 
-  <script>
+<div class="controls">
+  視点方向
+  <select name="viewmode">
+    <option value="xy">手前(Z to X-Y)</option>
+    <option value="xz">真上(Y to X-Z)</option>
+  </select>
+</div>
+
+<div id="content">
+  <canvas></canvas>
+</div>
+<div id="dump"></div>
+
+<script>
 $(function() {
   var $dump = $('#dump');
 
@@ -196,6 +195,4 @@ $(function() {
     }
   }).change();
 });
-  </script>
-</body>
-</html>
+</script>

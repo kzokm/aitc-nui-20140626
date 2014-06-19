@@ -1,34 +1,34 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Gestures</title>
+
+<meta charset="UTF-8">
+<title>Gestures</title>
+
 <!--
-  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
-  <script src="http://js.leapmotion.com/leap-0.6.0.min.js"></script>
+<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="http://js.leapmotion.com/leap-0.6.0.min.js"></script>
 -->
-  <script src="vendor/js/jquery-2.1.1.min.js"></script>
-  <script src="vendor/js/leap-0.6.0.min.js"></script>
-  <link rel="stylesheet" href="css/canvas.css">
-</head>
-<body>
-  <h1>Gestures</h1>
-  <p>Show the gestures. There are four gesture the swipe, cycle, key tap and screen tap.</p>
+<script src="vendor/js/jquery-2.1.1.min.js"></script>
+<script src="vendor/js/leap-0.6.0.min.js"></script>
 
-  <div class="controls">
-    Target:
-    <input type="checkbox" name="swipe" checked>Swipe
-    <input type="checkbox" name="circle" checked>Circle
-    <input type="checkbox" name="keyTap" checked>Key tap
-    <input type="checkbox" name="screenTap" checked>Screen tap
-  </div>
+<link rel="stylesheet" href="css/canvas.css">
 
-  <div id="content">
-    <canvas></canvas>
-  </div>
-  <div id="dump"></div>
+<h1>Gestures</h1>
+<p>Show the gestures. There are four gesture the swipe, cycle, key tap and screen tap.</p>
 
-  <script>
+<div class="controls">
+  Target:
+  <input type="checkbox" name="swipe" checked>Swipe
+  <input type="checkbox" name="circle" checked>Circle
+  <input type="checkbox" name="keyTap" checked>Key tap
+  <input type="checkbox" name="screenTap" checked>Screen tap
+</div>
+
+<div id="content">
+  <canvas></canvas>
+</div>
+<div id="dump"></div>
+
+<script>
 $(function() {
   var $dump = $('#dump');
 
@@ -181,6 +181,4 @@ $(function() {
     gestureEnables[this.name] = this.checked;
   }).change();
 });
-  </script>
-</body>
-</html>
+</script>

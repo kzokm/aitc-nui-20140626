@@ -1,6 +1,3 @@
-body{
-}
-
 .controls {
   position: relative;
   z-index: 1;
@@ -18,15 +15,15 @@ body{
   overflow: hidden;
 }
 
-#dump {
-  margin-top: 1em;
-  color: #333;
-}
-
-canvas {
+#content canvas {
   margin: 0;
   padding: 0;
 
   background-color: #e8e8e8;
   opacity: 0.6;
+}
+
+#dump {
+  margin-top: 1em;
+  color: #333;
 }

@@ -1,36 +1,35 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Bone Hands</title>
+<meta charset="utf-8">
+<title>Bone Hands</title>
+
 <!--
-  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
-  <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r67/three.js"></script>
-  <script src="http://js.leapmotion.com/leap-0.6.0.min.js"></script>
-  <script src="http://js.leapmotion.com/leap-plugins-0.1.6.min.js"></script>
+<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r67/three.js"></script>
+<script src="http://js.leapmotion.com/leap-0.6.0.min.js"></script>
+<script src="http://js.leapmotion.com/leap-plugins-0.1.6.min.js"></script>
 -->
-  <script src="vendor/js/jquery-2.1.1.min.js"></script>
-  <script src="vendor/js/three-r67.min.js"></script>
-  <script src="vendor/js/leap-0.6.0.min.js"></script>
-  <script src="vendor/js/leap-plugins-0.1.6.min.js"></script>
-  <link rel="stylesheet" href="css/canvas.css">
-</head>
-<body>
-  <h1>Bone Hands</h1>
-  <p>Show the all bone positions.</p>
+<script src="vendor/js/jquery-2.1.1.min.js"></script>
+<script src="vendor/js/three-r67.min.js"></script>
+<script src="vendor/js/leap-0.6.0.min.js"></script>
+<script src="vendor/js/leap-plugins-0.1.6.min.js"></script>
 
-  <div class="controls">
-    視点方向
-    <select name="viewmode">
-      <option value="xy">手前(Z to X-Y)</option>
-      <option value="xz">真上(Y to X-Z)</option>
-    </select>
-  </div>
+<link rel="stylesheet" href="css/canvas.css">
 
-  <div id="content"></div>
-  <div id="dump"></div>
+<h1>Bone Hands</h1>
+<p>Show the all bone positions.</p>
 
-  <script>
+<div class="controls">
+  視点方向
+  <select name="viewmode">
+    <option value="xy">手前(Z to X-Y)</option>
+    <option value="xz">真上(Y to X-Z)</option>
+  </select>
+</div>
+
+<div id="content"></div>
+<div id="dump"></div>
+
+<script>
 $(function() {
   var $dump = $('#dump');
 
@@ -139,11 +138,11 @@ $(function() {
     $(':input[name="viewmode"]').change(function() {
       switch ($(this).val()) {
         case 'xy':
-          camera.position.fromArray([0, 150, 500]);
+          camera.position.set(0, 150, 500);
           camera.lookAt(new THREE.Vector3(0, 200, 0));
           break;
         case 'xz':
-          camera.position.fromArray([0, 600, 1]);
+          camera.position.set(0, 600, 1);
           camera.lookAt(new THREE.Vector3(0, 0, 0));
           break;
       }
@@ -164,6 +163,4 @@ $(function() {
     renderer.render(scene, camera);
   }).resize();
 });
-  </script>
-</body>
-</html>
+</script>
