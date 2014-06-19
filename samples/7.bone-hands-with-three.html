@@ -20,9 +20,10 @@
 
 <div class="controls">
   視点方向
-  <select name="viewmode">
-    <option value="xy">手前(Z to X-Y)</option>
-    <option value="xz">真上(Y to X-Z)</option>
+  <select name="camera_position">
+    <option value="normal">手前</option>
+    <option value="above">真上</option>
+    <option value="screenside">画面側</option>
   </select>
 </div>
 
@@ -135,16 +136,20 @@ $(function() {
     scene.add(directionalLight);
 
     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000);
-    $(':input[name="viewmode"]').change(function() {
+    $(':input[name="camera_position"]').change(function() {
       switch ($(this).val()) {
-        case 'xy':
-          camera.position.set(0, 150, 500);
-          camera.lookAt(new THREE.Vector3(0, 200, 0));
-          break;
-        case 'xz':
-          camera.position.set(0, 600, 1);
-          camera.lookAt(new THREE.Vector3(0, 0, 0));
-          break;
+      case 'normal':
+        camera.position.set(0, 150, 500);
+        camera.lookAt(new THREE.Vector3(0, 200, 0));
+        break;
+      case 'screenside':
+        camera.position.set(0, 200, -500);
+        camera.lookAt(new THREE.Vector3(0, 200, 0));
+        break;
+      case 'above':
+        camera.position.set(0, 600, 1);
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        break;
       }
     }).change();
 
