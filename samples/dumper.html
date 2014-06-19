@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+<!--
+  <script src="http://js.leapmotion.com/leap-0.6.0.min.js"></script>
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+-->
+  <script src="vendor/js/leap-0.6.0.min.js"></script>
+  <script src="vendor/js/jquery-2.1.1.min.js"></script>
+</head>
+<body>
+  <div id="controls">
+    <button onclick="controller.disconnect();">Disconnect</button>
+    <button onclick="controller.connect();">Connect</button>
+    <div id="message">
+      <p><b>Press spacebar to pause.</b></p>
+      <p style="display: none; color: red"><b>PAUSED</b></p>
+  </div>
+  <div id="dump"></div>
+  <script>
+var controller = new Leap.Controller({enableGestures:true});
+var FRAME_SAMPLING_INTERVAL = 60;
+
+$.each({
+  blur: 'The application has lost operating system input focus.',
+  focus: 'The application has gained operating system input focus and will start receiving tracking data.',
+  connect: 'The WebSocket connection is open.',
+  disconnect: 'The WebSocket connection is lost or the Leap Motion hardware is removed.',
+  deviceAttached: 'A Leap Motion device is attached.',
+  deviceRemoved: 'A Leap Motion device is detached',
+  deviceStreaming: 'A particular attached device has started providing data.',
+  deviceStopped: 'A particular attached device has stopped providing data.',
+  streamingStarted: 'An attached device has started providing data and no device was previously streaming data.',
+  streamingStopped: 'All attached devices have stopped providing data.',
+  protocol: 'The WebSocket subprotocol has been negotiated. You can get the negotiated protocol from this event.',
+  ready: 'The connection and device are ready.'
+}, function(name, description) {
+  controller.on(name, function() {
+    console.log(name, arguments);
+  });
+});
+
+var numFrames = FRAME_SAMPLING_INTERVAL;
+
+controller.on('animationFrame', function(frame) {
+  if (!paused) {
+    $('#dump').html(frame.dump());
+    if (numFrames++ >= FRAME_SAMPLING_INTERVAL) {
+      console.log('Frame event has been detected.', arguments);
+      numFrames = 0;
+    }
+  }
+});
+
+controller.connect();
+
+var paused = false;
+
+$(window).keydown(function(e) {
+  if (e.keyCode == 32) {
+    paused ^= true;
+    $('#message p').toggle();
+  }
+});
+</script>
+<body>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Gestures</title>
+<!--
+  <script src="http://js.leapmotion.com/leap-0.6.0.min.js"></script>
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+-->
+  <script src="vendor/js/leap-0.6.0.min.js"></script>
+  <script src="vendor/js/jquery-2.1.1.min.js"></script>
+  <link rel="stylesheet" href="css/canvas.css">
+</head>
+<body>
+  <h1>Gestures</h1>
+  <p>Show the gestures. There are four gesture the swipe, cycle, key tap and screen tap.</p>
+
+  <div class="controls">
+    Target:
+    <input type="checkbox" name="swipe" checked>Swipe
+    <input type="checkbox" name="circle" checked>Circle
+    <input type="checkbox" name="keyTap" checked>Key tap
+    <input type="checkbox" name="screenTap" checked>Screen tap
+  </div>
+
+  <div id="content">
+    <canvas></canvas>
+  </div>
+
+  <script>
+$(function() {
+  Leap.loop({enableGestures: true}, function(frame){
+    if (frame.gestures.length > 0) {
+      canvas.clear();
+      var html = '';
+      $.each(frame.gestures, function() {
+        if (gestureEnables[this.type]) {
+          console.log(this);
+          html += 'Gesture Type: ' + this.type +'<br>'
+          html += 'Gesture State: ' + this.state +'<br>'
+          html += 'Details: ' + this.toString() + '<br><br>'
+
+          switch (this.type) {
+            case 'swipe':
+              onSwipe(frame, this);
+              break;
+            case 'circle':
+              onCircle(frame, this);
+              break;
+            case 'keyTap':
+              onKeyTap(frame, this);
+              break;
+            case 'screenTap':
+              onScreenTap(frame, this);
+              break;
+          }
+        }
+      });
+      $('#dump').html(html);
+    }
+  });
+
+  function onSwipe(frame, gesture) {
+    var startPosition = canvas.leapToScene(frame, gesture.startPosition);
+    canvas.fillCircle(startPosition, 10, 'orange');
+    canvas.drawLine(startPosition,
+                    canvas.leapToScene(frame, gesture.position),
+                    'orange');
+  }
+
+  function onCircle(frame, gesture) {
+    var clockwise = (gesture.normal[2] <= 0);
+    canvas.drawCircle(canvas.leapToScene(frame, gesture.center),
+                      gesture.radius,
+                      clockwise ? 'blue' : 'red');
+  }
+
+  function onKeyTap(frame, gesture) {
+    canvas.fillCircle(canvas.leapToScene(frame, gesture.position),
+                      15, 'cyan');
+  }
+
+  function onScreenTap(frame, gesture) {
+    canvas.fillCircle(canvas.leapToScene(frame, gesture.position),
+                      30, 'green');
+  }
+
+  var Canvas = function(element) {
+    this.element = element;
+    this.context = element.getContext('2d');
+  };
+
+  Canvas.prototype = {
+    width: 0, height: 0,
+    iBoxArea: {},
+
+    resize: function(width, height) {
+      this.element.width = this.width = width;
+      this.element.height = this.height = height;
+
+      var marginLeft = width * 0.3;
+      var marginTop = height * 0.25;
+      this.iBoxArea = {
+        left: marginLeft,
+        top: marginTop,
+        width: width - marginLeft * 2,
+        height: height - marginTop * 2
+      };
+      this.clear();
+    },
+
+    clear: function() {
+      this.context.clearRect(0, 0, this.width, this.height);
+      this.drawIBoxArea();
+    },
+
+    drawIBoxArea: function() {
+      var box = this.iBoxArea;
+      var c = this.context;
+      c.strokeStyle = 'black';
+      c.lineWidth = 1;
+      c.strokeRect(box.left, box.top, box.width, box.height);
+    },
+
+    drawLine: function(from, to, color) {
+      var c = this.context;
+      c.strokeStyle = color;
+      c.lineWidth = 3;
+      c.beginPath();
+      c.moveTo(from.x, from.y)
+      c.lineTo(to.x, to.y)
+      c.closePath();
+      c.stroke();
+    },
+
+    drawCircle: function(center, radius, color) {
+      var c = this.context;
+      c.strokeStyle = color;
+      c.lineWidth = 3;
+      c.beginPath();
+      c.arc(center.x, center.y, radius, 0, Math.PI * 2);
+      c.closePath();
+      c.stroke();
+    },
+
+    fillCircle: function(center, radius, color) {
+      var c = this.context;
+      c.fillStyle = color;
+      c.beginPath();
+      c.arc(center.x, center.y, radius, 0, Math.PI * 2);
+      c.closePath();
+      c.fill();
+    },
+
+    leapToScene: function(frame, vec3) {
+      vec3 = frame.interactionBox.normalizePoint(vec3);
+
+      var box = this.iBoxArea;
+      return {
+        x: vec3[0] * box.width + box.left,
+        y: this.height - (vec3[1] * box.height + box.top)
+      }
+    },
+  };
+
+  var canvas = new Canvas($('canvas')[0]);
+  $(window).resize(function() {
+    var position = $('#content').position();
+    var width = $(window).width() - position.left * 2;
+    var height = $(window).height() - position.top - position.left * 2;
+    canvas.resize(width, height);
+  }).resize();
+
+  var gestureEnables = {}
+  $('input:checkbox').change(function() {
+    gestureEnables[this.name] = this.checked;
+  }).change();
+});
+  </script>
+
+  <div id="dump"></div>
+</body>
+</html>
