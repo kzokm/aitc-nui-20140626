@@ -40,7 +40,6 @@ $(function() {
   });
 
   function isValid(hand) {
-
     return hand.palmPosition[2] < 100           // 画面からの距離が遠すぎず
         && Math.abs(hand.palmVelocity[2]) < 10; // かつ、静止に近い状態
   }

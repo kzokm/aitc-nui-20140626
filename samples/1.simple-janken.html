@@ -5,36 +5,34 @@
   <title>Janken - You will win!</title>
 <!--
   <script src="http://js.leapmotion.com/0.2.2/leap.min.js"></script>
-  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
 -->
   <script src="vendor/js/leap-0.2.2.min.js"></script>
-  <script src="vendor/js/jquery-2.1.1.min.js"></script>
 </head>
 <body>
   <div id="my-hand" style="font-size:300%;"></div>
   <script>
-$(function() {
-  var $me = $('#my-hand');
+(function() {
+  var me = document.getElementById('my-hand');
 
-  Leap.loop(function(frame){
+  Leap.loop(function(frame) {
     if (frame.hands.length == 1) {
       switch (frame.fingers.length) {
         case 0: // GU
-          $me.html('<img src="images/choki.png">');
+          me.innerHTML = '<img src="images/choki.png">';
           break;
         case 2: // CHOKI
-          $me.html('<img src="images/pa.png">');
+          me.innerHTML = '<img src="images/pa.png">';
           break;
         case 5: // PA
-          $me.html('<img src="images/gu.png">');
+          me.innerHTML = '<img src="images/gu.png">';
           break;
       }
     }
     else {
-      $me.text('じゃんけん');
+      me.innerHTML = 'じゃんけん';
     }
   });
-});
+})();
   </script>
 </body>
 </html>

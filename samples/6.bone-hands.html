@@ -13,7 +13,7 @@
 </head>
 <body>
   <h1>Bone Hands</h1>
-  <p>Show the all finger positions.</p>
+  <p>Show the all bone positions.</p>
 
   <div class="controls">
     視点方向
@@ -26,6 +26,8 @@
   <div id="content">
     <canvas></canvas>
   </div>
+  <div id="dump"></div>
+
   <script>
 $(function() {
   var BONE_COLOR = [ '#ff3', '#3f3', '#3ff', '#f33' ];
@@ -37,30 +39,30 @@ $(function() {
     if (frame.hands.length > 0) {
       console.log(frame);
     }
-
-    $('#dump').html(frame.dump());
     canvas.clear();
 
-    $.each(frame.hands, function() {
-      $.each(this.fingers, function() {
-        $.each(this.bones, function(i) {
-          canvas.drawBone(canvas.leapToScene(frame, this.prevJoint),
-                          canvas.leapToScene(frame, this.nextJoint),
+    frame.hands.forEach(function(hand) {
+      hand.fingers.forEach(function(finger) {
+        finger.bones.forEach(function(bone, i) {
+          canvas.drawBone(canvas.leapToScene(frame, bone.prevJoint),
+                          canvas.leapToScene(frame, bone.nextJoint),
                           BONE_COLOR[i]);
         });
 
         // APIドキュメントにはbtipPositionの記述があるが、未定義なのでdistal.nextJointを用いる。
-        canvas.drawJoint(canvas.leapToScene(frame, this.distal.nextJoint), JOINT_COLOR[4]);
-        canvas.drawJoint(canvas.leapToScene(frame, this.dipPosition), JOINT_COLOR[3]);
-        canvas.drawJoint(canvas.leapToScene(frame, this.pipPosition), JOINT_COLOR[2]);
-        canvas.drawJoint(canvas.leapToScene(frame, this.mcpPosition), JOINT_COLOR[1]);
-        canvas.drawJoint(canvas.leapToScene(frame, this.carpPosition), JOINT_COLOR[0]);
+        canvas.drawJoint(canvas.leapToScene(frame, finger.distal.nextJoint), JOINT_COLOR[4]);
+        canvas.drawJoint(canvas.leapToScene(frame, finger.dipPosition), JOINT_COLOR[3]);
+        canvas.drawJoint(canvas.leapToScene(frame, finger.pipPosition), JOINT_COLOR[2]);
+        canvas.drawJoint(canvas.leapToScene(frame, finger.mcpPosition), JOINT_COLOR[1]);
+        canvas.drawJoint(canvas.leapToScene(frame, finger.carpPosition), JOINT_COLOR[0]);
 
-        canvas.drawTip(canvas.leapToScene(frame, this.tipPosition), TIP_COLOR);
+        canvas.drawTip(canvas.leapToScene(frame, finger.tipPosition), TIP_COLOR);
       });
 
-      canvas.drawPalm(canvas.leapToScene(frame, this.palmPosition), PALM_COLOR);
+      canvas.drawPalm(canvas.leapToScene(frame, hand.palmPosition), PALM_COLOR);
     });
+
+    $('#dump').html(frame.dump());
   });
 
   var Canvas = function(element) {
@@ -137,12 +139,15 @@ $(function() {
       vec3 = frame.interactionBox.normalizePoint(vec3);
 
       var box = this.iBoxArea;
-      var pos = {}
-      pos.x = vec3[X] * box.width + box.left;
-      pos.y = vec3[Y] * box.height + box.top;
+      var pos = {
+        x: vec3[X] * box.width + box.left,
+        y: vec3[Y] * box.height + box.top
+      };
+
       if (Y != 2) {
         pos.y = this.height - pos.y;
       }
+
       var radius;
       if (Z == 1) {
         radius = 1.0 - vec3[Z];
@@ -160,15 +165,16 @@ $(function() {
         }
       }
       pos.inbounds = (pos.inbounds === undefined);
+
       return pos;
     }
   };
 
   var canvas = new Canvas($('canvas')[0]);
   $(window).resize(function() {
-    var position = $('#content').position();
-    var width = $(window).width() - position.left * 2;
-    var height = $(window).height() - position.top - position.left * 2;
+    var margin = $('#content').position();
+    var width = window.innerWidth - margin.left * 2;
+    var height = window.innerHeight - margin.top - margin.left * 2;
     canvas.resize(width, height);
   }).resize();
 
@@ -189,7 +195,5 @@ $(function() {
   }).change();
 });
   </script>
-
-  <div id="dump"></div>
 </body>
 </html>

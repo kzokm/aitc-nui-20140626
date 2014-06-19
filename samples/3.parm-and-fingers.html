@@ -26,23 +26,28 @@
   <div id="content">
     <canvas></canvas>
   </div>
+  <div id="dump"></div>
+
   <script>
 $(function() {
+  var $dump = $('#dump');
+
   Leap.loop(function(frame) {
     if (frame.hands.length > 0) {
       console.log(frame);
     }
-    $('#dump').html(frame.dump());
     canvas.clear();
 
-    $.each(frame.hands, function() {
-      var palmPosition = canvas.leapToScene(frame, this.palmPosition);
-      $.each(this.fingers, function() {
+    frame.hands.forEach(function(hand) {
+      var palmPosition = canvas.leapToScene(frame, hand.palmPosition);
+      hand.fingers.forEach(function(finger) {
         canvas.drawFinger(palmPosition,
-                          canvas.leapToScene(frame, this.tipPosition));
+                          canvas.leapToScene(frame, finger.tipPosition));
       });
       canvas.drawPalm(palmPosition);
     });
+
+    $dump.html(frame.dump());
   });
 
   var Canvas = function(element) {
@@ -115,12 +120,15 @@ $(function() {
       vec3 = frame.interactionBox.normalizePoint(vec3);
 
       var box = this.iBoxArea;
-      var pos = {}
-      pos.x = vec3[X] * box.width + box.left;
-      pos.y = vec3[Y] * box.height + box.top;
+      var pos = {
+        x: vec3[X] * box.width + box.left,
+        y: vec3[Y] * box.height + box.top
+      };
+
       if (Y != 2) {
         pos.y = this.height - pos.y;
       }
+
       var radius;
       if (Z == 1) {
         radius = 1.0 - vec3[Z];
@@ -138,36 +146,31 @@ $(function() {
         }
       }
       pos.inbounds = (pos.inbounds === undefined);
+
       return pos;
     }
   };
 
   var canvas = new Canvas($('canvas')[0]);
   $(window).resize(function() {
-    var position = $('#content').position();
-    var width = $(window).width() - position.left * 2;
-    var height = $(window).height() - position.top - position.left * 2;
+    var margin = $('#content').position();
+    var width = window.innerWidth - margin.left * 2;
+    var height = window.innerHeight - margin.top - margin.left * 2;
     canvas.resize(width, height);
   }).resize();
 
-  var X = 0, Y = 1, Z = 2;
+  var X, Y, Z;
   $(':input[name="viewmode"]').change(function() {
     switch ($(this).val()) {
       case 'xy':
-        X = 0;
-        Y = 1;
-        Z = 2;
+        X = 0; Y = 1; Z = 2;
         break;
       case 'xz':
-        X = 0;
-        Y = 2;
-        Z = 1;
+        X = 0; Y = 2; Z = 1;
         break;
     }
   }).change();
 });
   </script>
-
-  <div id="dump"></div>
 </body>
 </html>

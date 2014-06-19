@@ -26,36 +26,41 @@
   <div id="content">
     <canvas></canvas>
   </div>
+  <div id="dump"></div>
 
   <script>
 $(function() {
+  var $dump = $('#dump');
+
   Leap.loop({enableGestures: true}, function(frame){
     if (frame.gestures.length > 0) {
       canvas.clear();
-      var html = '';
-      $.each(frame.gestures, function() {
-        if (gestureEnables[this.type]) {
-          console.log(this);
-          html += 'Gesture Type: ' + this.type +'<br>'
-          html += 'Gesture State: ' + this.state +'<br>'
-          html += 'Details: ' + this.toString() + '<br><br>'
 
-          switch (this.type) {
+      var html = '';
+      frame.gestures.forEach(function(gesture) {
+        if (gestureEnables[gesture.type]) {
+          console.log(gesture);
+          html += 'Gesture Type: ' + gesture.type +'<br>'
+          html += 'Gesture State: ' + gesture.state +'<br>'
+          html += 'Details: ' + gesture.toString() + '<br><br>'
+
+          switch (gesture.type) {
             case 'swipe':
-              onSwipe(frame, this);
+              onSwipe(frame, gesture);
               break;
             case 'circle':
-              onCircle(frame, this);
+              onCircle(frame, gesture);
               break;
             case 'keyTap':
-              onKeyTap(frame, this);
+              onKeyTap(frame, gesture);
               break;
             case 'screenTap':
-              onScreenTap(frame, this);
+              onScreenTap(frame, gesture);
               break;
           }
         }
       });
+
       $('#dump').html(html);
     }
   });
@@ -165,9 +170,9 @@ $(function() {
 
   var canvas = new Canvas($('canvas')[0]);
   $(window).resize(function() {
-    var position = $('#content').position();
-    var width = $(window).width() - position.left * 2;
-    var height = $(window).height() - position.top - position.left * 2;
+    var margin = $('#content').position();
+    var width = window.innerWidth - margin.left * 2;
+    var height = window.innerHeight - margin.top - margin.left * 2;
     canvas.resize(width, height);
   }).resize();
 
@@ -177,7 +182,5 @@ $(function() {
   }).change();
 });
   </script>
-
-  <div id="dump"></div>
 </body>
 </html>
