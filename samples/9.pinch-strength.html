@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<meta charset="utf-8">
+<title>Pinch and Grab</title>
+
+<!--
+<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r67/three.js"></script>
+<script src="http://js.leapmotion.com/leap-0.6.0.min.js"></script>
+<script src="http://js.leapmotion.com/leap-plugins-0.1.6.min.js"></script>
+<script src="http://js.leapmotion.com/leap.rigged-hand-0.1.4.min.js"></script>
+-->
+<script src="vendor/js/jquery-2.1.1.min.js"></script>
+<script src="vendor/js/three-r67.min.js"></script>
+<script src="vendor/js/leap-0.6.0.min.js"></script>
+<script src="vendor/js/leap-plugins-0.1.6.min.js"></script>
+<script src="vendor/js/leap.rigged-hand-0.1.4.min.js"></script>
+
+<style>
+.controls {
+  position: relative;
+  z-index: 1;
+}
+
+#content {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+#content .value {
+  font-size: 60px;
+  background-color: #fff;
+}
+
+#content .border {
+  border: 1px solid #000;
+  margin-top: -15px;
+}
+
+#content .progress {
+  height: 20px;
+  width: 0%;
+}
+
+.pinch {
+  color : #06a;
+}
+
+.pinch .progress {
+  background-color : #06a;
+}
+
+.grab {
+  color : #a33;
+}
+
+.grab .progress {
+  background-color : #a33;
+}
+
+
+#grab {
+}
+</style>
+
+<h1><span class="pinch">Pinch</span> and <span class="grab">Grab</span></h1>
+
+<div class="controls">
+  視点方向
+  <select name="camera_position">
+    <option value="normal">手前</option>
+    <option value="above">真上</option>
+    <option value="screenside">画面側</option>
+  </select>
+</div>
+
+<div id="content">
+  <div id="pinch" class="pinch">
+    <div class="value">0.0</div>
+    <div class="border">
+      <div class="progress"></div>
+    </div>
+  </div>
+  <div id="grab" class="grab">
+    <div class="value">0.0</div>
+    <div class="border">
+      <div class="progress"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(function() {
+  var controller = Leap.loop({
+    hand: function(hand) {
+      console.log(hand);
+      $('#pinch .value').text(hand.pinchStrength.toPrecision(2));
+      $('#pinch .progress').width(hand.pinchStrength * 100 + '%');
+      $('#grab .value').text(hand.grabStrength.toPrecision(2));
+      $('#grab .progress').width(hand.grabStrength * 100 + '%');
+    }
+  }).use('riggedHand', {
+    boneColors: function (boneMesh, leapHand) {
+      if ((boneMesh.name.indexOf('Finger_') == 0) ) {
+        if (leapHand.pinchStrength > 0) {
+          var pinchingFinger = findPinchingFinger(leapHand);
+          if ((boneMesh.name.indexOf('Finger_0') == 0)
+              || (boneMesh.name.indexOf('Finger_' + pinchingFinger.type) == 0)) {
+            return {
+              hue: 0.564,
+              saturation: leapHand.pinchStrength,
+              lightness: 0.5
+            }
+          }
+        }
+        return {
+          hue: 0.0,
+          saturation: leapHand.grabStrength,
+          lightness: 0.5
+        }
+      }
+    }
+  }).on('riggedHand.meshAdded', function(handMesh, leapHand) {
+    handMesh.material.opacity = 0.5;
+  });
+
+  function findPinchingFinger(hand) {
+    var pincher;
+    var closest = 500;
+    for (var f = 1; f < 5; f++) { // 親指以外
+      current = hand.fingers[f];
+      var distance = Leap.vec3.distance(hand.thumb.tipPosition, current.tipPosition);
+      if(current != hand.thumb && distance < closest) {
+        closest = distance;
+        pincher = current;
+      }
+    }
+    return pincher;
+  }
+
+  $(':input[name="camera_position"]').change(function() {
+    var camera = controller.plugins.riggedHand.camera;
+
+    switch ($(this).val()) {
+    case 'normal':
+      camera.position.set(0, 10, 25);
+      camera.lookAt(new THREE.Vector3(0, 0, 0));
+      break;
+    case 'screenside':
+      camera.position.set(0, 5, -25);
+      camera.lookAt(new THREE.Vector3(0, 0, 0));
+      break;
+    case 'above':
+      camera.position.set(0, 25, 1);
+      camera.lookAt(new THREE.Vector3(0, 0, 0));
+      break;
+    }
+  }).change();
+});
+</script>
