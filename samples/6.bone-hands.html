@@ -30,6 +30,8 @@
 
   <script>
 $(function() {
+  var $dump = $('#dump');
+
   var BONE_COLOR = [ '#ff3', '#3f3', '#3ff', '#f33' ];
   var JOINT_COLOR = [ '#888', '#ff8', '#8f8', '#8ff', '#f88' ];
   var TIP_COLOR = '#000';
@@ -62,7 +64,7 @@ $(function() {
       canvas.drawPalm(canvas.leapToScene(frame, hand.palmPosition), PALM_COLOR);
     });
 
-    $('#dump').html(frame.dump());
+    $dump.html(frame.dump());
   });
 
   var Canvas = function(element) {
