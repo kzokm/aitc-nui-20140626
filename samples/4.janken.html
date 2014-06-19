@@ -49,6 +49,7 @@ $(function() {
   function act(hand) {
     if (currentHand != hand) { // 変更があったときのみ画像を差し替える
       $me.html($("#image-cache img."+hand).clone());
+      currentHand = hand;
     }
   }
 
