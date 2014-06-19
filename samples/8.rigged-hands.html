@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Rigged Hands</title>
+
+<!--
+<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r67/three.js"></script>
+<script src="http://js.leapmotion.com/leap-0.6.0.min.js"></script>
+<script src="http://js.leapmotion.com/leap-plugins-0.1.6.min.js"></script>
+<script src="http://js.leapmotion.com/leap.rigged-hand-0.1.4.min.js"></script>
+-->
+<script src="vendor/js/three-r67.min.js"></script>
+<script src="vendor/js/leap-0.6.0.min.js"></script>
+<script src="vendor/js/leap-plugins-0.1.6.min.js"></script>
+<script src="vendor/js/leap.rigged-hand-0.1.4.min.js"></script>
+
+<h1>Rigged Hands</h1>
+
+<script>
+(function() {
+  new Leap.Controller()
+    .use('riggedHand')
+    .on('riggedHand.meshAdded', function(handMesh, leapHand) {
+      handMesh.material.opacity = 1;
+    })
+    .connect();
+})();
+</script>
