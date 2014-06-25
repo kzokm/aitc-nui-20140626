@@ -32,10 +32,11 @@
 $(function() {
   var $dump = $('#dump');
 
-  var BONE_COLOR = [ '#ff3', '#3f3', '#3ff', '#f33' ];
-  var JOINT_COLOR = [ '#888', '#ff8', '#8f8', '#8ff', '#f88' ];
-  var TIP_COLOR = '#000';
-  var PALM_COLOR = '#000';
+  var BONE_COLOR = [ '#ff3', '#3f3', '#3ff', '#f33', '#008' ];
+  var FINGER_JOINT_COLOR = [ '#888', '#ff8', '#8f8', '#8ff', '#f88' ];
+  var ARM_JOINT_COLOR = [ '#33c', '#33c' ];
+  var TIP_COLOR = '#333';
+  var PALM_COLOR = '#333';
 
   Leap.loop(function(frame) {
     if (frame.hands.length > 0) {
@@ -48,20 +49,29 @@ $(function() {
         finger.bones.forEach(function(bone, i) {
           canvas.drawBone(canvas.leapToScene(frame, bone.prevJoint),
                           canvas.leapToScene(frame, bone.nextJoint),
-                          BONE_COLOR[i]);
+                          BONE_COLOR[bone.type]);
         });
 
         // APIドキュメントにはbtipPositionの記述があるが、未定義なのでdistal.nextJointを用いる。
-        canvas.drawJoint(canvas.leapToScene(frame, finger.distal.nextJoint), JOINT_COLOR[4]);
-        canvas.drawJoint(canvas.leapToScene(frame, finger.dipPosition), JOINT_COLOR[3]);
-        canvas.drawJoint(canvas.leapToScene(frame, finger.pipPosition), JOINT_COLOR[2]);
-        canvas.drawJoint(canvas.leapToScene(frame, finger.mcpPosition), JOINT_COLOR[1]);
-        canvas.drawJoint(canvas.leapToScene(frame, finger.carpPosition), JOINT_COLOR[0]);
+        canvas.drawJoint(canvas.leapToScene(frame, finger.distal.nextJoint), FINGER_JOINT_COLOR[4]);
+        canvas.drawJoint(canvas.leapToScene(frame, finger.dipPosition), FINGER_JOINT_COLOR[3]);
+        canvas.drawJoint(canvas.leapToScene(frame, finger.pipPosition), FINGER_JOINT_COLOR[2]);
+        canvas.drawJoint(canvas.leapToScene(frame, finger.mcpPosition), FINGER_JOINT_COLOR[1]);
+        canvas.drawJoint(canvas.leapToScene(frame, finger.carpPosition), FINGER_JOINT_COLOR[0]);
 
         canvas.drawTip(canvas.leapToScene(frame, finger.tipPosition), TIP_COLOR);
       });
 
       canvas.drawPalm(canvas.leapToScene(frame, hand.palmPosition), PALM_COLOR);
+
+      if (hand.arm) {
+        var bone = hand.arm;
+        var elbowPosition = canvas.leapToScene(frame, bone.prevJoint);
+        var wristPosition = canvas.leapToScene(frame, bone.nextJoint);
+        canvas.drawBone(elbowPosition, wristPosition, BONE_COLOR[bone.type]);
+        canvas.drawJoint(elbowPosition, ARM_JOINT_COLOR[0]);
+        canvas.drawJoint(wristPosition, ARM_JOINT_COLOR[1]);
+      }
     });
 
     $dump.html(frame.dump());

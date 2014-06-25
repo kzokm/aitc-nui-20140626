@@ -34,53 +34,82 @@
 $(function() {
   var $dump = $('#dump');
 
-  var BONE_COLOR = [ '#ff3', '#3f3', '#3ff', '#f33' ];
-  var JOINT_COLOR = [ '#888', '#ff8', '#8f8', '#8ff', '#f88' ];
+  var BONE_COLOR = [ '#ff3', '#3f3', '#3ff', '#f33', '#008' ];
+  var FINGER_JOINT_COLOR = [ '#888', '#ff8', '#8f8', '#8ff', '#f88' ];
+  var ARM_JOINT_COLOR = [ '#33c', '#33c' ];
 
   var baseBoneRotation = (new THREE.Quaternion).setFromEuler(
       new THREE.Euler(Math.PI / 2, 0, 0)
   );
 
-  Leap.loop(function(frame) {
-    if (frame.hands.length > 0) {
-      console.log(frame);
+  Leap.loop({ hand: function(hand) {
+    console.log(hand);
+
+    if (hand.arm) {
+      var arm = hand.arm;
+      var armMeshes = hand.data('armMeshes');
+      armMeshes[0].position.fromArray(arm.center());
+      armMeshes[0].setRotationFromMatrix(
+        (new THREE.Matrix4).fromArray(arm.matrix()));
+      armMeshes[0].quaternion.multiply(baseBoneRotation);
+
+      armMeshes[1].position.fromArray(arm.prevJoint);
+      armMeshes[2].position.fromArray(arm.nextJoint);
     }
 
-    frame.hands.forEach(function(hand) {
-      hand.fingers.forEach(function(finger) {
-        finger.data('boneMeshes').forEach(function(mesh, i) {
-          var bone = finger.bones[i];
-          mesh.position.fromArray(bone.center());
-          mesh.setRotationFromMatrix(
-            (new THREE.Matrix4).fromArray(bone.matrix()));
-          mesh.quaternion.multiply(baseBoneRotation);
-        });
-
-        finger.data('jointMeshes').forEach(function(mesh, i) {
-          var bone = finger.bones[i];
-          if (bone) {
-            mesh.position.fromArray(bone.prevJoint);
-          }
-          else {
-            mesh.position.fromArray(finger.distal.nextJoint); // btip
-          }
-        });
+    hand.fingers.forEach(function(finger) {
+      finger.data('boneMeshes').forEach(function(mesh, i) {
+        var bone = finger.bones[i];
+        mesh.position.fromArray(bone.center());
+        mesh.setRotationFromMatrix(
+          (new THREE.Matrix4).fromArray(bone.matrix()));
+        mesh.quaternion.multiply(baseBoneRotation);
       });
 
-      renderer.render(scene, camera);
+      finger.data('jointMeshes').forEach(function(mesh, i) {
+        var bone = finger.bones[i];
+        if (bone) {
+          mesh.position.fromArray(bone.prevJoint);
+        }
+        else {
+          mesh.position.fromArray(finger.distal.nextJoint); // btip
+        }
+      });
     });
 
-    $dump.html(frame.dump());
-  })
+    renderer.render(scene, camera);
+  }})
   .use('handHold') // jQueryライクなdataメソッドで継続的なデータ保持を可能にする。
   .use('handEntry') // handFoundおよびhandLostイベントを提供する。
   .on('handFound', function(hand) {
+    var mesh;
+
+    var armMeshes = [];
+    if (hand.arm) {
+      mesh = new THREE.Mesh(
+        new THREE.CylinderGeometry(5, 5, hand.arm.length),
+        new THREE.MeshPhongMaterial({ color: BONE_COLOR[4] })
+      );
+      scene.add(mesh);
+      armMeshes.push(mesh);
+
+      for (var i = 0; i < 2; i++) {
+        mesh = new THREE.Mesh(
+            new THREE.SphereGeometry(8),
+            new THREE.MeshPhongMaterial({ color: ARM_JOINT_COLOR[i] })
+        );
+        scene.add(mesh);
+        armMeshes.push(mesh);
+      }
+    }
+    hand.data('armMeshes', armMeshes);
+
     hand.fingers.forEach(function (finger) {
       var boneMeshes = [];
       var jointMeshes = [];
 
       finger.bones.forEach(function(bone, i) {
-        var mesh = new THREE.Mesh(
+        mesh = new THREE.Mesh(
             new THREE.CylinderGeometry(5, 5, bone.length),
             new THREE.MeshPhongMaterial({ color: BONE_COLOR[i] })
         );
@@ -90,9 +119,9 @@ $(function() {
       finger.data('boneMeshes', boneMeshes);
 
       for (var i = 0; i < finger.bones.length + 1; i++) {
-        var mesh = new THREE.Mesh(
+        mesh = new THREE.Mesh(
             new THREE.SphereGeometry(8),
-            new THREE.MeshPhongMaterial({ color: JOINT_COLOR[i] })
+            new THREE.MeshPhongMaterial({ color: FINGER_JOINT_COLOR[i] })
         );
         scene.add(mesh);
         jointMeshes.push(mesh);
@@ -102,11 +131,11 @@ $(function() {
   })
   .on('handLost', function(hand) {
     hand.fingers.forEach(function (finger) {
-      finger.data('boneMeshes').forEach(function(mesh){
+      finger.data('boneMeshes').forEach(function(mesh) {
         scene.remove(mesh);
       });
 
-      finger.data('jointMeshes').forEach(function(mesh){
+      finger.data('jointMeshes').forEach(function(mesh) {
         scene.remove(mesh);
       });
 
@@ -116,6 +145,11 @@ $(function() {
       });
 
     });
+
+    hand.data('armMeshes').forEach(function(mesh) {
+      scene.remove(mesh);
+    });
+    hand.data('armMeshes', null);
 
     renderer.render(scene, camera);
   });
