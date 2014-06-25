@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>Janken - You will win!</title>
+
+<!--
+<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="http://js.leapmotion.com/leap-0.6.1.min.js"></script>
+-->
+<script src="vendor/js/jquery-2.1.1.min.js"></script>
+<script src="vendor/js/leap-0.6.1.min.js"></script>
+
+<div id="my-hand" style="font-size:300%;"></div>
+<div id="image-cache" style="display:none">
+  <img class="gu" src="images/gu.png" alt="ぐー">
+  <img class="choki" src="images/choki.png" alt="ちょき">
+  <img class="pa" src="images/pa.png" alt="ぱー">
+</div>
+
+<script>
+$(function() {
+  Leap.loop(function(frame){
+    if (frame.hands.length == 1) {
+      if (isValid(frame.hands[0])) {
+        numFingers = countExtendedFingers(frame.hands[0]);
+        if (numFingers == 0) { // グー
+          act('choki');
+        }
+        else if (numFingers <= 3) { // 1～3本ならチョキ
+          act('pa');
+        }
+        else { // 4本以上はパー
+          act('gu');
+        }
+      }
+    }
+    else {
+      reset();
+    }
+  });
+
+  function isValid(hand) {
+    return hand.palmPosition[2] < 100           // 画面からの距離が遠すぎず
+        && Math.abs(hand.palmVelocity[2]) < 10; // かつ、静止に近い状態
+  }
+
+  function countExtendedFingers(hand) {
+    var counter = 0;
+    hand.fingers.forEach(function(finger) {
+      if (finger.extended) counter++;
+    });
+    return counter;
+  }
+
+  var $me = $('#my-hand');
+  var currentHand;
+
+  function act(hand) {
+    if (currentHand != hand) { // 変更があったときのみ画像を差し替える
+      $me.html($("#image-cache img."+hand).clone());
+      currentHand = hand;
+    }
+  }
+
+  function reset() {
+    currentHand = undefined;
+    $me.text('じゃんけん');
+  }
+
+  reset();
+});
+</script>
