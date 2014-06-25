@@ -54,7 +54,6 @@ $(function() {
         break;
       case 'touching':
         var opacity = 0.5 - pointable.touchDistance * 0.5;
-console.log(opacity);
         var fillColor = 'rgba(192, 0, 0, ' +  opacity + ')';
         canvas.fillCircle(position, 20, fillColor);
         canvas.drawCircle(position, 20, '#800');
