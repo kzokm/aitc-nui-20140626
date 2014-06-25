@@ -1,4 +1,1 @@
-aitc-nui-20140626
-=================
-
-Samples of leap.js
+2014/06/26 AITCナチュラルユーザーインターフェース活用部会 LeapMotion勉強会資料
