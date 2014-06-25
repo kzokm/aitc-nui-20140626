@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<meta charset="utf-8">
+<title>Touch</title>
+
+<!--
+<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r67/three.js"></script>
+<script src="http://js.leapmotion.com/leap-0.6.1.min.js"></script>
+-->
+<script src="vendor/js/jquery-2.1.1.min.js"></script>
+<script src="vendor/js/three-r67.min.js"></script>
+<script src="vendor/js/leap-0.6.1.min.js"></script>
+
+<script src="js/leapCanvas.js"></script>
+<link rel="stylesheet" href="css/leapCanvas.css">
+
+<h1>Touch Emulation</h1>
+<p>Show hovering and touching points.</p>
+
+<div id="content">
+  <canvas></canvas>
+</div>
+<div id="dump"></div>
+
+<script>
+$(function() {
+  var $dump = $('#dump');
+
+  Leap.loop(function(frame) {
+    if (frame.pointables.length > 0) {
+      console.log(frame);
+    }
+    canvas.clear();
+
+    var html = '';
+    frame.pointables.forEach(function(pointable, i) {
+      if (!pointable.extended) return;
+
+      html += 'Touch Zone: ' + pointable.touchZone +'<br>'
+      html += 'Touch Distance: ' + pointable.touchDistance +'<br>'
+      html += '<br>'
+
+      var position = canvas.leapToScene(frame, pointable.tipPosition);
+      switch (pointable.touchZone) {
+      case 'none':
+        canvas.fillCircle(position, 20, '#aaa');
+        break;
+      case 'hovering':
+        var opacity = 1.0 - pointable.touchDistance;
+        var fillColor = 'rgba(0, 192, 0, ' +  opacity + ')';
+        canvas.fillCircle(position, 20, fillColor);
+        canvas.drawCircle(position, 20, '#080');
+        break;
+      case 'touching':
+        var opacity = 0.5 - pointable.touchDistance * 0.5;
+console.log(opacity);
+        var fillColor = 'rgba(192, 0, 0, ' +  opacity + ')';
+        canvas.fillCircle(position, 20, fillColor);
+        canvas.drawCircle(position, 20, '#800');
+        break;
+      }
+    });
+    $dump.html(html);
+  });
+
+
+  var canvas = new LeapCanvas($('canvas')[0]);
+  canvas.iBoxArea.scale = { width: 0.8, height: 0.8 };
+
+  $(window).resize(function() {
+    canvas.setSize(window.innerWidth, window.innerHeight);
+  }).resize();
+});
+</script>
