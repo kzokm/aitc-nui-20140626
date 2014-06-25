@@ -5,11 +5,12 @@
 
 <!--
 <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
-<script src="http://js.leapmotion.com/leap-0.6.0.min.js"></script>
+<script src="http://js.leapmotion.com/leap-0.6.1.min.js"></script>
 -->
 <script src="vendor/js/jquery-2.1.1.min.js"></script>
-<script src="vendor/js/leap-0.6.0.min.js"></script>
+<script src="vendor/js/leap-0.6.1.min.js"></script>
 
+<script src="js/leapCanvas.js"></script>
 <link rel="stylesheet" href="css/leapCanvas.css">
 
 <h1>Gestures</h1>
@@ -90,90 +91,11 @@ $(function() {
                       30, 'green');
   }
 
-  var Canvas = function(element) {
-    this.element = element;
-    this.context = element.getContext('2d');
-  };
 
-  Canvas.prototype = {
-    width: 0, height: 0,
-    iBoxArea: {},
+  var canvas = new LeapCanvas($('canvas')[0]);
 
-    resize: function(width, height) {
-      this.element.width = this.width = width;
-      this.element.height = this.height = height;
-
-      var marginLeft = width * 0.3;
-      var marginTop = height * 0.25;
-      this.iBoxArea = {
-        left: marginLeft,
-        top: marginTop,
-        width: width - marginLeft * 2,
-        height: height - marginTop * 2
-      };
-      this.clear();
-    },
-
-    clear: function() {
-      this.context.clearRect(0, 0, this.width, this.height);
-      this.drawIBoxArea();
-    },
-
-    drawIBoxArea: function() {
-      var box = this.iBoxArea;
-      var c = this.context;
-      c.strokeStyle = 'black';
-      c.lineWidth = 1;
-      c.strokeRect(box.left, box.top, box.width, box.height);
-    },
-
-    drawLine: function(from, to, color) {
-      var c = this.context;
-      c.strokeStyle = color;
-      c.lineWidth = 3;
-      c.beginPath();
-      c.moveTo(from.x, from.y)
-      c.lineTo(to.x, to.y)
-      c.closePath();
-      c.stroke();
-    },
-
-    drawCircle: function(center, radius, color) {
-      var c = this.context;
-      c.strokeStyle = color;
-      c.lineWidth = 3;
-      c.beginPath();
-      c.arc(center.x, center.y, radius, 0, Math.PI * 2);
-      c.closePath();
-      c.stroke();
-    },
-
-    fillCircle: function(center, radius, color) {
-      var c = this.context;
-      c.fillStyle = color;
-      c.beginPath();
-      c.arc(center.x, center.y, radius, 0, Math.PI * 2);
-      c.closePath();
-      c.fill();
-    },
-
-    leapToScene: function(frame, vec3) {
-      vec3 = frame.interactionBox.normalizePoint(vec3);
-
-      var box = this.iBoxArea;
-      return {
-        x: vec3[0] * box.width + box.left,
-        y: this.height - (vec3[1] * box.height + box.top)
-      }
-    },
-  };
-
-  var canvas = new Canvas($('canvas')[0]);
   $(window).resize(function() {
-    var margin = $('#content').position();
-    var width = window.innerWidth - margin.left * 2;
-    var height = window.innerHeight - margin.top - margin.left * 2;
-    canvas.resize(width, height);
+    canvas.setSize(window.innerWidth, window.innerHeight);
   }).resize();
 
   var gestureEnables = {}

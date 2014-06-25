@@ -1,5 +1,5 @@
 /*!                                                              
- * LeapJS v0.6.0                                                  
+ * LeapJS v0.6.1                                                  
  * http://github.com/leapmotion/leapjs/                                        
  *                                                                             
  * Copyright 2013 LeapMotion, Inc. and other contributors                      
@@ -27,6 +27,7 @@ var Bone = module.exports = function(finger, data) {
   * * 1 -- proximal
   * * 2 -- medial
   * * 3 -- distal
+  * * 4 -- arm
   *
   * @member type
   * @type {number}
@@ -726,7 +727,7 @@ Controller.prototype.setupConnectionEvents = function() {
     }
   }
   // Delegate connection events
-  this.connection.on('focus', function() { controller.emit('focus'); controller.runAnimationLoop(); });
+  this.connection.on('focus', function() { controller.emit('focus'); });
   this.connection.on('blur', function() { controller.emit('blur') });
   this.connection.on('protocol', function(protocol) { controller.emit('protocol', protocol); });
   this.connection.on('ready', function() {
@@ -2394,6 +2395,7 @@ KeyTapGesture.prototype.toString = function() {
 
 },{"events":21,"gl-matrix":23,"underscore":24}],10:[function(require,module,exports){
 var Pointable = require("./pointable")
+  , Bone = require('./bone')
   , glMatrix = require("gl-matrix")
   , mat3 = glMatrix.mat3
   , vec3 = glMatrix.vec3
@@ -2531,6 +2533,19 @@ var Hand = module.exports = function(data) {
    * @type {Leap.Pointable[]}
    */
   this.fingers = [];
+  
+  if (data.armBasis){
+    this.arm = new Bone(this, {
+      type: 4,
+      width: data.armWidth,
+      prevJoint: data.elbow,
+      nextJoint: data.wrist,
+      basis: data.armBasis
+    });
+  }else{
+    this.arm = null;
+  }
+  
   /**
    * The list of tools detected in this frame that are held by this
    * hand, given in arbitrary order.
@@ -2832,7 +2847,7 @@ Hand.Invalid = {
   translation: function() { return vec3.create(); }
 };
 
-},{"./pointable":14,"gl-matrix":23,"underscore":24}],11:[function(require,module,exports){
+},{"./bone":1,"./pointable":14,"gl-matrix":23,"underscore":24}],11:[function(require,module,exports){
 /**
  * Leap is the global namespace of the Leap API.
  * @namespace Leap
@@ -2885,11 +2900,19 @@ module.exports = {
    * ```
    */
   loop: function(opts, callback) {
-    if (callback === undefined && (!opts.frame && !opts.hand)) {
+    if (opts && callback === undefined && (!opts.frame && !opts.hand)) {
       callback = opts;
       opts = {};
     }
-    if (!this.loopController) this.loopController = new this.Controller(opts);
+
+    if (this.loopController) {
+      if (opts){
+        this.loopController.setupFrameEvents(opts);
+      }
+    }else{
+      this.loopController = new this.Controller(opts);
+    }
+
     this.loopController.loop(callback);
     return this.loopController;
   },
@@ -3476,10 +3499,10 @@ _.extend(Region.prototype, EventEmitter.prototype)
 },{"events":21,"underscore":24}],19:[function(require,module,exports){
 // This file is automatically updated from package.json by grunt.
 module.exports = {
-  full: '0.6.0',
+  full: '0.6.1',
   major: 0,
   minor: 6,
-  dot: 0
+  dot: 1
 }
 },{}],20:[function(require,module,exports){
 
