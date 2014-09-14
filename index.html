@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<ul>
+<li>01.simple-janken.html
+<li>02.count-fingers.html
+<li>03.parm-and-fingers.html
+<li>04.janken.html
+<li>05.gesture.html
+<li>06.bone-hands.html
+<li>07.bone-hands-with-three.html
+<li>08.rigged-hands.html
+<li>09.pinch-strength.html
+<li>10.janken-v2.html
+<li>11.touch-emulation.html
+</ul>
+
+<script>
+  ul = document.getElementsByTagName('li')
+  for (var i = 0, len = ul.length; i < len; i++) {
+    var li = ul[i]
+    target = li.innerHTML
+    li.innerHTML = '<a href="samples/' + target +'">' + target
+  }
+</script>
